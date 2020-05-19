@@ -8,8 +8,8 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted']
     steps:
-      - uses: actions/checkout@v1
+      - uses: zendesk/checkout@v2
       - run: npm ci
       - run: npm test
