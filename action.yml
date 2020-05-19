@@ -19,6 +19,14 @@ inputs:
     description: '`true` to identify the release as a prerelease. `false` to identify the release as a full release. Default: `false`'
     required: false
     default: false
+  prerelease_suffix:
+    description: 'Annotate a prerelease version tag with suffix'
+    required: false
+    default: 'beta'  
+  auto_increment_type:
+    description: 'bump tag version type, Is this a major, minor, patch, or prerelease?'
+    required: false
+    default: 'patch'
 outputs:
   id:
     description: 'The ID of the created Release'

@@ -62,7 +62,7 @@ function determinePrereleaseName(semTag) {
 
 function computeNextSemantic(semTag) {
   try {
-    const type = core.getInput('version_type') || Semantic.Patch;
+    const type = core.getInput('auto_increment_type') || Semantic.Patch;
     const preName = determinePrereleaseName(semTag);
 
     switch (type) {
