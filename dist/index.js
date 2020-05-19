@@ -10219,9 +10219,9 @@ function isNullString(string) {
 // If there is no previous tag, Then the intial tag will be used
 function initialTag(tag) {
   const suffix = core.getInput('prerelease_suffix');
-  const newTag = prerelease ? `${tag}-${suffix}` : tag;
+  const newTag = prerelease ? `${tag}-${suffix}.0` : tag;
 
-  return `${newTag}.0`;
+  return newTag;
 }
 
 async function existingTags() {
@@ -10251,11 +10251,8 @@ function semanticVersion(tag) {
 }
 
 function determinePrereleaseName(semTag) {
-  const hasExistingPrerelease = semTag.prerelease.length > 0;
-
-  if (hasExistingPrerelease) {
-    const [name, _] = semTag.prerelease;
-    return name;
+  if (semTag.prerelease.length > 0) {
+    return semTag.prerelease[0];
   }
   return core.getInput('prerelease_suffix') || 'beta';
 }
