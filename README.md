@@ -1,5 +1,6 @@
+
 # GitHub Action - Releases API
-This GitHub Action (written in JavaScript) wraps the  [Create a Release](https://developer.github.com/v3/repos/releases/#create-a-release) endpoint and [Auto Increment Tag Version ](#auto-increment-tag-version) feature. Which allows to create tag automatically when pushed to the release branch. This is also an alternative to Samson Release functionality.
+This GitHub Action (written in JavaScript) wraps the  [Create a Release](https://developer.github.com/v3/repos/releases/#create-a-release) endpoint and [Auto Increment Tag Version ](#auto-increment---path-type---push-to-master) feature. Which allows to create tag automatically when pushed to the release branch. This is also an alternative to Samson Release functionality.
 
 <a href="https://github.com/actions/create-release"><img alt="GitHub Actions status" src="https://github.com/zendesk/action-create-release/workflows/Tests/badge.svg"></a>
 
@@ -34,9 +35,9 @@ For more information on these outputs, see the [API Documentation](https://devel
 | `current_tag`       | The tag used to create a Release.|
                     
 
-## Example workflow 
+## Example workflow - Create a release
 
-### Create a release - Auto Invermenting Version - Push to master
+### Auto Increment - Patch type - Push to master
 On every `push` to a `master` branch will create tag incrementally.
 
 ```yaml
@@ -50,27 +51,36 @@ name: Create Release
 jobs:
   build:
     name: Create Release
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted']
     steps:
-      - name: Checkout code
-        uses: zendesk/checkout@v2
       - name: Create Release
         id: create_release
-        uses: zendesk/action-create-release@v2
+        uses: zendesk/action-create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
-Sample Output:
 
+***Sample Output:***
+```
 previous_tag: v5.0.3
 current_tag:  v5.0.4
 id:           123
 upload_url:   https://uploads.github.com/repos/zendesk/Hello-World/releases/1/assets
 html_url:     https://github.com/octocat/Hello-World/releases/v1.0.0
+```
+
+### Auto Increment types and outputs
+
+| Type              | Previous Tag        | Current Tag         | 
+| ----------------- | ------------------- | ------------------- |
+| major             | `v5.0.1`            | `v6.0.0`            |
+| minor             | `v5.0.1`            | `v5.1.1`            |
+| patch             | `v5.0.1`            | `v5.0.2`            |
+| prerelease        | `v5.0.1`            | `v5.0.2-beta.0`     |
+| premajor          | `v5.0.1`            | `v6.0.1-beta.0`     |
 
 
-
-### Create a release - For tag
+### Tag as parameter
 On every `push` to a tag matching the pattern `v*`, [create a release](https://developer.github.com/v3/repos/releases/#create-a-release):
 
 ```yaml
@@ -85,13 +95,11 @@ name: Create Release
 jobs:
   build:
     name: Create Release
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted']
     steps:
-      - name: Checkout code
-        uses: zendesk/checkout@v2
       - name: Create Release
         id: create_release
-        uses: zendesk/create-release@v1
+        uses: zendesk/action-create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
