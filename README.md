@@ -20,6 +20,7 @@ For more information on these inputs, see the [API Documentation](https://develo
 | `prerelease`          |  `true` to identify the release as a prerelease. `false` to identify the release as a full release. | N        |  `false`       |
 | `prerelease_suffix`   | The suffix added to a prerelease tag, if none already exists.                 | N        | `beta`       |
 | `auto_increment_type` | Used for auto-incrementing the tag version. One of (`major`, `minor`, `patch`, `prerelease`, `premajor`).  | N        | `patch` |
+| `tag_schema`          | Used for computing the tag schema. One of (`continuous`, `semantic`).  | N        | `continuous` |
 
 
 

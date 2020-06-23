@@ -27,6 +27,10 @@ inputs:
     description: 'bump tag version type, Is this a major, minor, patch, or prerelease?'
     required: false
     default: 'patch'
+  tag_schema:
+    description: 'schema used to compute next tag. continuous or semantic'
+    required: false
+    default: 'continuous'
 outputs:
   id:
     description: 'The ID of the created Release'

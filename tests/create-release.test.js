@@ -53,6 +53,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('refs/tags/v1.0.0')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('false')
@@ -75,6 +76,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('refs/tags/v1.0.0')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('true')
@@ -93,10 +95,46 @@ describe('Create Release', () => {
     });
   });
 
+  test('auto tagged with semantic version', async () => {
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('major')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('') // <-- The default value for body in action.yml
+      .mockReturnValueOnce('false')
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v1.0.0',
+      name: 'myRelease',
+      body: '',
+      draft: false,
+      prerelease: false
+    });
+  });
+
+  test('Unsupported tag schema', async () => {
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('test');
+
+    await run();
+
+    expect(createRelease).not.toHaveBeenCalled();
+  });
+
   test('Release with empty body is created', async () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('refs/tags/v1.0.0')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('') // <-- The default value for body in action.yml
       .mockReturnValueOnce('false')
@@ -119,6 +157,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('refs/tags/v1.0.0')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('false')
@@ -138,6 +177,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('refs/tags/v1.0.0')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('false')
@@ -163,6 +203,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('')
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('') // <-- The default value for body in action.yml
@@ -173,7 +214,7 @@ describe('Create Release', () => {
     expect(createRelease).toHaveBeenCalledWith({
       owner: 'owner',
       repo: 'repo',
-      tag_name: 'v1.0.0',
+      tag_name: 'v1',
       name: 'myRelease',
       body: '',
       draft: false,
@@ -187,6 +228,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('')
       .mockReturnValueOnce('')
       .mockReturnValueOnce('myRelease')
@@ -198,7 +240,7 @@ describe('Create Release', () => {
     expect(createRelease).toHaveBeenCalledWith({
       owner: 'owner',
       repo: 'repo',
-      tag_name: 'v1.1.1',
+      tag_name: 'v2',
       name: 'myRelease',
       body: '',
       draft: false,
@@ -212,6 +254,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('')
+      .mockReturnValueOnce('continuous')
       .mockReturnValueOnce('prerelease')
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('') // <-- The default value for body in action.yml
@@ -222,12 +265,56 @@ describe('Create Release', () => {
     expect(createRelease).toHaveBeenCalledWith({
       owner: 'owner',
       repo: 'repo',
-      tag_name: 'v1.1.0-pre.1',
+      tag_name: 'v1-pre.1',
       name: 'myRelease',
       body: '',
       draft: false,
       prerelease: false
     });
+  });
+
+  test('Auto increment with prerelease version - semantic', async () => {
+    jest.resetModules();
+    mockValues([{ ref: 'v1.0.0' }]);
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('prerelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('') // <-- The default value for body in action.yml
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v1.0.1-beta.0',
+      name: 'myRelease',
+      body: '',
+      draft: false,
+      prerelease: false
+    });
+  });
+
+  test('Invalid last tag', async () => {
+    jest.resetModules();
+    mockValues([{ ref: '$@#' }]);
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('xyz')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('') // <-- The default value for body in action.yml
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    expect(core.setFailed).toHaveBeenNthCalledWith(1, 'Failed to parse tag: $@#');
   });
 
   test('Unsupported auto increment type', async () => {
@@ -236,6 +323,7 @@ describe('Create Release', () => {
     core.getInput = jest
       .fn()
       .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
       .mockReturnValueOnce('xyz')
       .mockReturnValueOnce('')
       .mockReturnValueOnce('myRelease')

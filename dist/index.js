@@ -10335,6 +10335,10 @@ const semver = __webpack_require__(876);
 const process = __webpack_require__(765);
 
 const octokit = new GitHub(process.env.GITHUB_TOKEN);
+const Scheme = {
+  Continuous: 'continuous',
+  Semantic: 'semantic'
+};
 const Semantic = {
   Major: 'major',
   Minor: 'minor',
@@ -10382,11 +10386,27 @@ function semanticVersion(tag) {
   }
 }
 
+function determineContinuousBumpType(semTag) {
+  const type = core.getInput('auto_increment_type') || Semantic.Major;
+  if (type === Semantic.Prerelease) {
+    return semTag.prerelease.length > 0 ? Semantic.Prerelease : Semantic.Premajor;
+  }
+  return type;
+}
+
 function determinePrereleaseName(semTag) {
   if (semTag.prerelease.length > 0) {
     return semTag.prerelease[0];
   }
   return core.getInput('prerelease_suffix') || 'beta';
+}
+
+function computeNextContinuous(semTag) {
+  const bumpType = determineContinuousBumpType(semTag);
+  const preName = determinePrereleaseName(semTag);
+  const nextSemTag = semver.parse(semver.inc(semTag, bumpType, preName));
+  const tagSuffix = nextSemTag.prerelease.length > 0 ? `-${nextSemTag.prerelease.join('.')}` : '';
+  return [semTag.options.tagPrefix, nextSemTag.major, tagSuffix].join('');
 }
 
 function computeNextSemantic(semTag) {
@@ -10420,14 +10440,15 @@ async function computeLastTag() {
   return recentTags.shift().ref.replace('refs/tags/', '');
 }
 
-async function computeNextTag() {
+async function computeNextTag(scheme) {
   const lastTag = await computeLastTag();
-
   // Handle zero-state where no tags exist for the repo
   if (!lastTag) {
+    if (scheme === Scheme.Continuous) {
+      return initialTag('v1');
+    }
     return initialTag('v1.0.0');
   }
-
   core.info(`Computing the next tag based on: ${lastTag}`);
   core.setOutput('previous_tag', lastTag);
 
@@ -10439,6 +10460,9 @@ async function computeNextTag() {
   }
   semTag.options.tagPrefix = lastTag.startsWith('v') ? 'v' : '';
 
+  if (scheme === Scheme.Continuous) {
+    return computeNextContinuous(semTag);
+  }
   return computeNextSemantic(semTag);
 }
 
@@ -10446,8 +10470,13 @@ async function run() {
   try {
     // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
     const tagName = core.getInput('tag_name', { required: false });
+    const scheme = core.getInput('tag_schema', { required: false });
+    if (scheme !== Scheme.Continuous && scheme !== Scheme.Semantic) {
+      core.setFailed(`Unsupported version scheme: ${scheme}`);
+      return;
+    }
     // Use predefined tag or calculate automatic next tag
-    const tag = isNullString(tagName) ? await computeNextTag() : tagName.replace('refs/tags/', '');
+    const tag = isNullString(tagName) ? await computeNextTag(scheme) : tagName.replace('refs/tags/', '');
 
     const releaseName = core.getInput('release_name', { required: false });
     const release = isNullString(releaseName) ? tag : releaseName.replace('refs/tags/', '');
