@@ -299,6 +299,32 @@ describe('Create Release', () => {
     });
   });
 
+  test('Auto increment with premajor version - semantic', async () => {
+    jest.resetModules();
+    mockValues([{ ref: 'v1.0.0' }]);
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('premajor')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('') // <-- The default value for body in action.yml
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v2.0.0-beta.0',
+      name: 'myRelease',
+      body: '',
+      draft: false,
+      prerelease: false
+    });
+  });
+
   test('Invalid last tag', async () => {
     jest.resetModules();
     mockValues([{ ref: '$@#' }]);

@@ -10388,10 +10388,16 @@ function semanticVersion(tag) {
 
 function determineContinuousBumpType(semTag) {
   const type = core.getInput('auto_increment_type') || Semantic.Major;
-  if (type === Semantic.Prerelease) {
-    return semTag.prerelease.length > 0 ? Semantic.Prerelease : Semantic.Premajor;
+  const hasExistingPrerelease = semTag.prerelease.length > 0;
+
+  switch (type) {
+    case Semantic.Prerelease:
+      return hasExistingPrerelease ? Semantic.Prerelease : Semantic.Premajor;
+    case Semantic.Premajor:
+      return Semantic.Premajor;
+    default:
+      return Semantic.Major;
   }
-  return type;
 }
 
 function determinePrereleaseName(semTag) {
