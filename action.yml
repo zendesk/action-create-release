@@ -23,6 +23,9 @@ inputs:
     description: 'Annotate a prerelease version tag with suffix'
     required: false
     default: 'beta'  
+  commitish:
+    description: 'Any branch or commit SHA the Git tag is created from, unused if the Git tag already exists. Default: SHA of current commit'
+    required: false    
   auto_increment_type:
     description: 'bump tag version type, Is this a major, minor, patch, or prerelease?'
     required: false

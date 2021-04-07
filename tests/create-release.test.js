@@ -30,7 +30,7 @@ describe('Create Release', () => {
       owner: 'owner',
       repo: 'repo'
     };
-
+    context.sha = 'sha';
     const octokit = {
       repos: {
         createRelease
@@ -57,6 +57,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('false')
+      .mockReturnValueOnce('sha')
       .mockReturnValueOnce('false');
 
     await run();
@@ -68,7 +69,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: 'myBody',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -80,6 +82,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('true')
+      .mockReturnValueOnce('sha')
       .mockReturnValueOnce('false');
 
     await run();
@@ -91,7 +94,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: 'myBody',
       draft: true,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -104,6 +108,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('') // <-- The default value for body in action.yml
       .mockReturnValueOnce('false')
+      .mockReturnValueOnce('sha')
       .mockReturnValueOnce('false');
 
     await run();
@@ -115,7 +120,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -138,6 +144,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('') // <-- The default value for body in action.yml
       .mockReturnValueOnce('false')
+      .mockReturnValueOnce('sha')
       .mockReturnValueOnce('false');
 
     await run();
@@ -149,7 +156,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -161,6 +169,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('false')
+      .mockReturnValueOnce('sha')
       .mockReturnValueOnce('false');
 
     core.setOutput = jest.fn();
@@ -181,6 +190,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('false')
+      .mockReturnValueOnce('sha')
       .mockReturnValueOnce('false');
 
     createRelease.mockRestore();
@@ -218,7 +228,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -244,7 +255,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -269,7 +281,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -295,7 +308,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
@@ -321,7 +335,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha'
     });
   });
 
