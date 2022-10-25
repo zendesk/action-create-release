@@ -24,7 +24,7 @@ function isNullString(string) {
   return !string || string.length === 0 || string === 'null' || string === 'undefined';
 }
 
-// If there is no previous tag, Then the intial tag will be used
+// If there is no previous tag, Then the initial tag will be used
 function initialTag(tag) {
   const suffix = core.getInput('prerelease_suffix');
   const newTag = prerelease ? `${tag}-${suffix}.0` : tag;
