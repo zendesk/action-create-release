@@ -24,7 +24,7 @@
     "@actions/exec": "^1.1.0",
     "@actions/github": "^2.2.0",
     "semver": "^7.3.2",
-    "minimist": ">=0.2.1",
+    "minimist": ">=1.2.6",
     "kind-of": ">=6.0.3"
   },
   "devDependencies": {
