@@ -22,7 +22,7 @@ inputs:
   prerelease_suffix:
     description: 'Annotate a prerelease version tag with suffix'
     required: false
-    default: 'beta'  
+    default: 'beta'
   auto_increment_type:
     description: 'bump tag version type, Is this a major, minor, patch, or prerelease?'
     required: false
@@ -43,7 +43,7 @@ outputs:
   previous_tag:
     description: 'The most recent tag found during auto incrementing the tag version'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
 branding:
   icon: 'tag'
