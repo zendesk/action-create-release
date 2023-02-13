@@ -14,6 +14,7 @@ describe('Create Release', () => {
     core = require('@actions/core');
     const gitHub = require('@actions/github');
     [GitHub, context] = [gitHub.GitHub, gitHub.context];
+    context.sha = 'sha-value';
     createRelease = jest.fn().mockReturnValueOnce({
       data: {
         id: 'releaseId',
@@ -157,6 +158,29 @@ describe('Create Release', () => {
     });
   });
 
+  test('Release on context sha is created by default', async () => {
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('refs/tags/v1.0.0')
+      .mockReturnValueOnce('continuous')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('') // <-- The default value for body in action.yml
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v1.0.0',
+      name: 'myRelease',
+      body: '',
+      draft: false,
+      prerelease: false,
+      target_commitish: 'sha-value'
+    });
+  });
+
   test('Outputs are set', async () => {
     core.getInput = jest
       .fn()
@@ -222,7 +246,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha-value'
     });
   });
 
@@ -248,7 +273,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha-value'
     });
   });
 
@@ -273,7 +299,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha-value'
     });
   });
 
@@ -299,7 +326,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha-value'
     });
   });
 
@@ -325,7 +353,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'sha-value'
     });
   });
 
