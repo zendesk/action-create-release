@@ -11,16 +11,17 @@ Create a workflow `.yml` file in your `.github/workflows` directory. An [example
 ### Inputs
 For more information on these inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
-| Parameter             | Description                                                                                | Required | Default      |
-| -------------------   | ------------------------------------------------------------------------------------------ | -------- | ------------ |
-| `tag_name`            | The name of the tag for this release.                            | N    | Auto Incremented |
-| `release_name`        | The name of the release.                                         | N    |  TAG_NAME        |
-| `body`                | Text describing the contents of the release                      | N    |  N/A             |
-| `draft`               | `true` to create a draft (unpublished) release, `false` to create a published one.          | N        |  `false`       |
-| `prerelease`          |  `true` to identify the release as a prerelease. `false` to identify the release as a full release. | N        |  `false`       |
-| `prerelease_suffix`   | The suffix added to a prerelease tag, if none already exists.                 | N        | `beta`       |
-| `auto_increment_type` | Used for auto-incrementing the tag version. One of (`major`, `minor`, `patch`, `prerelease`, `premajor`).  | N        | `patch` |
-| `tag_schema`          | Used for computing the tag schema. One of (`continuous`, `semantic`).  | N        | `continuous` |
+| Parameter             | Description                                                                                                                 | Required | Default          |
+|-----------------------|-----------------------------------------------------------------------------------------------------------------------------|----------|------------------|
+| `tag_name`            | The name of the tag for this release.                                                                                       | N        | Auto Incremented |
+| `release_name`        | The name of the release.                                                                                                    | N        | TAG_NAME         |
+| `body`                | Text describing the contents of the release                                                                                 | N        | N/A              |
+| `draft`               | `true` to create a draft (unpublished) release, `false` to create a published one.                                          | N        | `false`          |
+| `prerelease`          | `true` to identify the release as a prerelease. `false` to identify the release as a full release.                          | N        | `false`          |
+| `prerelease_suffix`   | The suffix added to a prerelease tag, if none already exists.                                                               | N        | `beta`           |
+| `auto_increment_type` | Used for auto-incrementing the tag version. One of (`major`, `minor`, `patch`, `prerelease`, `premajor`).                   | N        | `patch`          |
+| `tag_schema`          | Used for computing the tag schema. One of (`continuous`, `semantic`).                                                       | N        | `continuous`     |
+| `commitish`           | Any branch or commit SHA the Git tag is created from, unused if the Git tag already exists. Default: SHA of current commit. | N        | `context.sha`    |
 
 
 
