@@ -57,7 +57,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('false')
-      .mockReturnValueOnce('false');
+      .mockReturnValueOnce('main');
 
     await run();
 
@@ -68,7 +68,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: 'myBody',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'main'
     });
   });
 
@@ -80,7 +81,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('myBody')
       .mockReturnValueOnce('true')
-      .mockReturnValueOnce('false');
+      .mockReturnValueOnce('main');
 
     await run();
 
@@ -91,7 +92,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: 'myBody',
       draft: true,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'main'
     });
   });
 
@@ -104,7 +106,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('') // <-- The default value for body in action.yml
       .mockReturnValueOnce('false')
-      .mockReturnValueOnce('false');
+      .mockReturnValueOnce('main');
 
     await run();
 
@@ -115,7 +117,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'main'
     });
   });
 
@@ -138,7 +141,7 @@ describe('Create Release', () => {
       .mockReturnValueOnce('myRelease')
       .mockReturnValueOnce('') // <-- The default value for body in action.yml
       .mockReturnValueOnce('false')
-      .mockReturnValueOnce('false');
+      .mockReturnValueOnce('main');
 
     await run();
 
@@ -149,7 +152,8 @@ describe('Create Release', () => {
       name: 'myRelease',
       body: '',
       draft: false,
-      prerelease: false
+      prerelease: false,
+      target_commitish: 'main'
     });
   });
 

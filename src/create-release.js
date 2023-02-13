@@ -161,6 +161,8 @@ async function run() {
     const body = core.getInput('body', { required: false });
     const draft = core.getInput('draft', { required: false }) === 'true';
 
+    const commitish = core.getInput('commitish', { required: false }) || context.sha;
+
     // Create a release
     // API Documentation: https://developer.github.com/v3/repos/releases/#create-a-release
     // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-create-release
@@ -171,7 +173,8 @@ async function run() {
       name: release,
       body,
       draft,
-      prerelease
+      prerelease,
+      target_commitish: commitish
     });
 
     // Get the ID, html_url, and upload URL for the created Release from the response
