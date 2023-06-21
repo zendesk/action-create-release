@@ -23,7 +23,7 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.0",
     "@actions/github": "^2.2.0",
-    "semver": "^7.3.2",
+    "semver": "^7.5.2",
     "minimist": ">=0.2.1",
     "kind-of": ">=6.0.3"
   },
