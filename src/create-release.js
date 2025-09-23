@@ -128,7 +128,7 @@ async function computeNextTag(scheme) {
     }
     return initialTag('v1.0.0');
   }
-  core.info(`Computing the next tag based on: ${lastTag}`);
+  core.info(`!!! Computing the next !!! tag based on: ${lastTag}`);
   core.setOutput('previous_tag', lastTag);
 
   const semTag = semanticVersion(lastTag);
