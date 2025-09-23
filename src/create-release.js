@@ -137,9 +137,7 @@ function computeNextSemantic(semTag) {
 async function computeLastTag() {
   const recentTags = await existingTags();
   const tagNames = recentTags.map(tag => tag.ref.replace('refs/tags/', ''));
-  core.info(`recentTags (first 10): ${tagNames.slice(0, 10).join(', ')}`);
-  core.info(`Most recent tag: ${tagNames[0] || 'none'}`);
-  
+  core.info(`recentTags (first 10): ${tagNames.slice(0, 10).join(', ')}`);  
   if (recentTags.length < 1) {
     return null;
   }
@@ -155,7 +153,7 @@ async function computeNextTag(scheme) {
     }
     return initialTag('v1.0.0');
   }
-  core.info(`!!! Computing the next !!! tag based on: ${lastTag}`);
+  core.info(`Computing the next tag based on: ${lastTag}`);
   core.setOutput('previous_tag', lastTag);
 
   const semTag = semanticVersion(lastTag);
@@ -183,9 +181,8 @@ async function run() {
     }
     // Use predefined tag or calculate automatic next tag
     const tag = isNullString(tagName) ? await computeNextTag(scheme) : tagName.replace('refs/tags/', '');
+    core.info(`Computed the next tag: ${tag}`);
 
-    core.info(`tag: ${tag}`);
-    return;
     const releaseName = core.getInput('release_name', { required: false });
     const release = isNullString(releaseName) ? tag : releaseName.replace('refs/tags/', '');
 
