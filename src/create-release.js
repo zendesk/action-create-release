@@ -111,6 +111,7 @@ function computeNextSemantic(semTag) {
 
 async function computeLastTag() {
   const recentTags = await existingTags();
+  console.log('recentTags', recentTags);
   if (recentTags.length < 1) {
     return null;
   }
