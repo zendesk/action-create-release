@@ -38,7 +38,32 @@ async function existingTags() {
     repo,
     ref: 'tags'
   });
-  return refs.reverse();
+  
+  // Sort tags by semantic version in descending order (highest first)
+  return refs.sort((a, b) => {
+    const tagA = a.ref.replace('refs/tags/', '');
+    const tagB = b.ref.replace('refs/tags/', '');
+    
+    // Try to parse as semantic versions
+    const versionA = semver.coerce(tagA);
+    const versionB = semver.coerce(tagB);
+    
+    // If both are valid semantic versions, compare them
+    if (versionA && versionB) {
+      return semver.rcompare(versionA, versionB); // reverse compare for descending order
+    }
+    
+    // If one or both are not valid semantic versions, fall back to string comparison
+    if (!versionA && !versionB) {
+      return tagB.localeCompare(tagA); // reverse for descending order
+    }
+    
+    // Put valid semantic versions before invalid ones
+    if (versionA && !versionB) return -1;
+    if (!versionA && versionB) return 1;
+    
+    return 0;
+  });
 }
 
 function semanticVersion(tag) {
@@ -111,6 +136,8 @@ function computeNextSemantic(semTag) {
 
 async function computeLastTag() {
   const recentTags = await existingTags();
+  const tagNames = recentTags.map(tag => tag.ref.replace('refs/tags/', ''));
+  core.info(`recentTags (first 10): ${tagNames.slice(0, 10).join(', ')}`);  
   if (recentTags.length < 1) {
     return null;
   }
@@ -154,6 +181,7 @@ async function run() {
     }
     // Use predefined tag or calculate automatic next tag
     const tag = isNullString(tagName) ? await computeNextTag(scheme) : tagName.replace('refs/tags/', '');
+    core.info(`Computed the next tag: ${tag}`);
 
     const releaseName = core.getInput('release_name', { required: false });
     const release = isNullString(releaseName) ? tag : releaseName.replace('refs/tags/', '');
