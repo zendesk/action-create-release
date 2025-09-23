@@ -111,7 +111,8 @@ function computeNextSemantic(semTag) {
 
 async function computeLastTag() {
   const recentTags = await existingTags();
-  console.log('recentTags', recentTags);
+  core.info(`recentTags: ${recentTags}`);
+  
   if (recentTags.length < 1) {
     return null;
   }
@@ -156,6 +157,8 @@ async function run() {
     // Use predefined tag or calculate automatic next tag
     const tag = isNullString(tagName) ? await computeNextTag(scheme) : tagName.replace('refs/tags/', '');
 
+    core.info(`tag: ${tag}`);
+    return;
     const releaseName = core.getInput('release_name', { required: false });
     const release = isNullString(releaseName) ? tag : releaseName.replace('refs/tags/', '');
 
