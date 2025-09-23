@@ -111,7 +111,7 @@ function computeNextSemantic(semTag) {
 
 async function computeLastTag() {
   const recentTags = await existingTags();
-  core.info(`recentTags: ${recentTags}`);
+  core.info(`recentTags: ${recentTags.map(tag => tag.ref.replace('refs/tags/', '')).join(', ')}`);
   
   if (recentTags.length < 1) {
     return null;
