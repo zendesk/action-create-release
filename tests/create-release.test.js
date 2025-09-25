@@ -363,4 +363,209 @@ describe('Create Release', () => {
       'Unsupported semantic version type xyz. Must be one of (major, minor, patch, premajor, prerelease)'
     );
   });
+
+  test('Tags are sorted correctly by semantic version', async () => {
+    jest.resetModules();
+    // Mock unsorted tags with semantic versions mixed up
+    const unsortedTags = [
+      { ref: 'v1.2.0' },
+      { ref: 'v1.275.0' }, // This should be first after sorting
+      { ref: 'v1.99.0' },
+      { ref: 'v1.1.0' }
+    ];
+
+    mockValues(unsortedTags);
+
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('minor')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('false')
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    // The highest version (v1.275.0) should be used as the base for incrementing
+    // In continuous mode, it should increment the minor version: v1.275.0 -> v1.276.0
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v1.276.0',
+      name: 'v1.276.0',
+      body: 'false',
+      draft: false,
+      prerelease: false
+    });
+  });
+
+  test('Auto increment with premajor type in continuous mode', async () => {
+    jest.resetModules();
+    mockValues([{ ref: 'v1.1.0-beta.0' }]);
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('continuous')
+      .mockReturnValueOnce('premajor')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v2-beta.0',
+      name: 'v2-beta.0',
+      body: 'myRelease',
+      draft: false,
+      prerelease: false
+    });
+  });
+
+  test('Error in computeNextSemantic function', async () => {
+    jest.resetModules();
+    mockValues([{ ref: 'v1.0.0' }]);
+
+    // Mock semver.inc to throw an error
+    const semver = require('semver');
+    jest.spyOn(semver, 'inc').mockImplementation(() => {
+      throw new Error('Invalid version');
+    });
+
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('patch')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('false');
+
+    core.setFailed = jest.fn();
+
+    await run();
+
+    expect(core.setFailed).toHaveBeenCalledWith('Failed to compute next semantic tag: Error: Invalid version');
+  });
+
+  test('Tags with identical semantic versions fall back to string comparison', async () => {
+    jest.resetModules();
+    // Mock tags that have the same semantic version after coercion
+    const identicalTags = [{ ref: 'v1.0.0-alpha' }, { ref: 'v1.0.0-beta' }];
+
+    mockValues(identicalTags);
+
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('patch')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('false')
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    // Should use the first tag after sorting (v1.0.0-beta comes first lexicographically when reversed)
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v1.0.0',
+      name: 'myRelease',
+      body: '',
+      draft: false,
+      prerelease: false
+    });
+  });
+
+  test('Tags with non-semantic versions fall back to string comparison', async () => {
+    jest.resetModules();
+    // Mock non-semantic tags
+    const nonSemanticTags = [{ ref: 'build-123' }, { ref: 'build-456' }];
+
+    mockValues(nonSemanticTags);
+
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('patch')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('false')
+      .mockReturnValueOnce('false');
+
+    core.setFailed = jest.fn();
+
+    await run();
+
+    // Should fail to parse the non-semantic tag
+    expect(core.setFailed).toHaveBeenCalledWith('Failed to parse tag: build-456');
+  });
+
+  test('Non-semantic tags only - string comparison', async () => {
+    jest.resetModules();
+    // Mock only non-semantic tags to test string comparison fallback
+    const nonSemanticOnlyTags = [{ ref: 'aaa' }, { ref: 'zzz' }];
+
+    mockValues(nonSemanticOnlyTags);
+
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('patch')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('false')
+      .mockReturnValueOnce('false');
+
+    core.setFailed = jest.fn();
+
+    await run();
+
+    // Should fail to parse the first non-semantic tag after string sorting (zzz comes first when reversed)
+    expect(core.setFailed).toHaveBeenCalledWith('Failed to parse tag: zzz');
+  });
+
+  test('One semantic one non-semantic tag - semantic version prioritized', async () => {
+    jest.resetModules();
+    // Mock mixed where one can be parsed as semantic and one cannot
+    const mixedOrderTags = [
+      { ref: 'abc-def' }, // Non-semantic (cannot be coerced)
+      { ref: 'v2.0.0' } // Semantic
+    ];
+
+    mockValues(mixedOrderTags);
+
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('semantic')
+      .mockReturnValueOnce('minor')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('myRelease')
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('false');
+
+    await run();
+
+    // Should prioritize the semantic version v2.0.0 and increment it
+    expect(createRelease).toHaveBeenCalledWith({
+      owner: 'owner',
+      repo: 'repo',
+      tag_name: 'v2.1.0',
+      name: 'myRelease',
+      body: '',
+      draft: false,
+      prerelease: false
+    });
+  });
 });
