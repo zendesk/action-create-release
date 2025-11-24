@@ -1,0 +1,7 @@
+# CODEOWNERS file
+# This file defines who should review code changes in this repository.
+#
+# Team ownership is managed via Zendesk Identity Governance (ZIG):
+# https://github.com/zendesk/zendesk-identity-governance
+
+* @zendesk/productivity-deploy-platform
