@@ -43,7 +43,7 @@ outputs:
   previous_tag:
     description: 'The most recent tag found during auto incrementing the tag version'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
 branding:
   icon: 'tag'
