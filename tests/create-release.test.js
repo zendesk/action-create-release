@@ -1,19 +1,25 @@
-jest.mock('@actions/core');
-jest.mock('@actions/github');
+// Factory mocks: automocking would require jest to parse the modern syntax used by these packages
+jest.mock('@actions/core', () => ({
+  getInput: jest.fn(),
+  info: jest.fn(),
+  setFailed: jest.fn(),
+  setOutput: jest.fn()
+}));
+jest.mock('@actions/github', () => ({ getOctokit: jest.fn(), context: {} }));
 
 /* eslint-disable no-undef */
 describe('Create Release', () => {
   let context;
   let core;
   let createRelease;
-  let GitHub;
+  let getOctokit;
   let listMatchingRefs;
   let run;
 
   function mockValues(previousTags = []) {
     core = require('@actions/core');
     const gitHub = require('@actions/github');
-    [GitHub, context] = [gitHub.GitHub, gitHub.context];
+    [getOctokit, context] = [gitHub.getOctokit, gitHub.context];
     createRelease = jest.fn().mockReturnValueOnce({
       data: {
         id: 'releaseId',
@@ -32,15 +38,17 @@ describe('Create Release', () => {
     };
 
     const octokit = {
-      repos: {
-        createRelease
-      },
-      git: {
-        listMatchingRefs
+      rest: {
+        repos: {
+          createRelease
+        },
+        git: {
+          listMatchingRefs
+        }
       }
     };
 
-    GitHub.mockImplementation(() => octokit);
+    getOctokit.mockImplementation(() => octokit);
     run = require('../src/create-release.js');
   }
 

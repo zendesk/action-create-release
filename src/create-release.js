@@ -1,11 +1,11 @@
 const core = require('@actions/core');
-const { GitHub, context } = require('@actions/github');
+const { getOctokit, context } = require('@actions/github');
 
 const { owner, repo } = context.repo;
 const semver = require('semver');
 const process = require('process');
 
-const octokit = new GitHub(process.env.GITHUB_TOKEN);
+const octokit = getOctokit(process.env.GITHUB_TOKEN);
 const Scheme = {
   Continuous: 'continuous',
   Semantic: 'semantic'
@@ -33,7 +33,7 @@ function initialTag(tag) {
 }
 
 async function existingTags() {
-  const { data: refs } = await octokit.git.listMatchingRefs({
+  const { data: refs } = await octokit.rest.git.listMatchingRefs({
     owner,
     repo,
     ref: 'tags'
@@ -73,6 +73,8 @@ function semanticVersion(tag) {
 
     if (!isNullString(pre)) {
       sem.prerelease = semver.prerelease(`0.0.0-${pre}`);
+      // Recompute `version`: newer semver releases derive it, not `prerelease`, when cloning in semver.inc()
+      if (sem.prerelease) sem.format();
     }
 
     return sem;
@@ -192,7 +194,7 @@ async function run() {
     // Create a release
     // API Documentation: https://developer.github.com/v3/repos/releases/#create-a-release
     // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-create-release
-    const createReleaseResponse = await octokit.repos.createRelease({
+    const createReleaseResponse = await octokit.rest.repos.createRelease({
       owner,
       repo,
       tag_name: tag,
