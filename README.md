@@ -8,6 +8,8 @@ This GitHub Action (written in JavaScript) wraps the  [Create a Release](https:/
 ### Pre-requisites
 Create a workflow `.yml` file in your `.github/workflows` directory. An [example workflow](#example-workflow---create-a-release) is available below. For more information, reference the GitHub Help Documentation for [Creating a workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file).
 
+This action runs on Node.js 24, provided by the Actions runner. Self-hosted runners require [Actions runner v2.327.1](https://github.com/actions/runner/releases/tag/v2.327.1) or newer and an operating system and architecture supported by Node.js 24. macOS 13.4 and earlier and ARM32 are not supported. Installing Node.js separately does not update the runner's bundled action runtime.
+
 ### Inputs
 For more information on these inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
